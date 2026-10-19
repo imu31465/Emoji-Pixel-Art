@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Emoji Pixel Art</title>
+<style>
+  :root{color-scheme:light;--bg:#f4f4f2;--panel:#fff;--panel2:#fafaf9;--line:#e4e4e2;--line-strong:#c9c9c6;--text:#171717;--muted:#737370;--soft:#999996;--radius:16px}
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font:inherit}
+  button{ -webkit-tap-highlight-color:transparent }
+  .wrap{width:min(1260px,calc(100% - 44px));margin:0 auto;padding:34px 0 50px}
+  header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--line)}.language{width:auto;min-width:112px;padding:9px 32px 9px 11px;font-size:12px;border-color:var(--line-strong);border-radius:9px}
+  .brand{display:flex;align-items:center;gap:14px}.logo{width:42px;height:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:8px;border:1px solid #1b1b1b;border-radius:11px;background:#171717}.logo span{display:block;background:#fff;border-radius:1px}.logo span:nth-child(2),.logo span:nth-child(4),.logo span:nth-child(8){opacity:.42}
+  h1{font-size:clamp(23px,3vw,30px);letter-spacing:-.055em;margin:0;font-weight:760}  .layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 4px 18px #00000004}
+  .controls{padding:22px;position:sticky;top:16px}.section-title{font-size:11px;font-weight:800;letter-spacing:.105em;text-transform:uppercase;color:#383836;margin:0 0 14px}
+  .drop{border:1px dashed #bcbcb8;border-radius:12px;background:#fafaf9;min-height:148px;padding:19px 13px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:background .16s,border-color .16s;outline:none}
+  .drop:hover,.drop.drag{border-color:#222;background:#f0f0ee}.upload-icon{width:34px;height:34px;border:1px solid #c9c9c5;border-radius:10px;background:#fff;color:#1b1b1b;display:grid;place-items:center;font-size:23px;line-height:1;margin-bottom:12px;font-weight:300}
+  .drop strong{font-size:13px;font-weight:700}.drop small{color:var(--muted);font-size:11px;margin-top:6px}.file-name{max-width:100%;overflow-wrap:anywhere;color:#444;font-size:11px;margin-top:9px}
+  #fileInput{display:none}.rule{height:1px;background:var(--line);margin:21px 0}
+  .field{margin:0 0 17px}.field label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:650;color:#353532;margin-bottom:9px}.field label span{color:var(--soft);font-size:10px;font-weight:500}.field label .label-main{color:#353532;font-size:12px;font-weight:650}
+  .dimension-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.num-wrap{display:flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:#fff;border-radius:9px;padding:0 10px;transition:border-color .15s}.num-wrap:focus-within{border-color:#333}.num-wrap input{width:100%;min-width:0;background:transparent;border:0;color:var(--text);outline:none;padding:10px 0;font-size:13px}.num-wrap input::-webkit-inner-spin-button,.num-wrap input::-webkit-outer-spin-button{opacity:1}.unit{font-size:10px;color:var(--muted)}
+  select{width:100%;background:#fff;border:1px solid var(--line-strong);border-radius:9px;color:var(--text);padding:10px 11px;outline:none;font-size:12px}select:focus{border-color:#333}
+  .presets{display:flex;gap:6px;flex-wrap:wrap}.preset{padding:7px 9px;background:#fff;border:1px solid #d8d8d4;color:#3b3b38;border-radius:8px;font-size:10px;font-weight:650;cursor:pointer;transition:all .14s}.preset:hover{border-color:#222;color:#111;background:#f5f5f3}
+  .primary{width:100%;padding:12px;border:1px solid #111;border-radius:9px;background:#171717;color:#fff;font-size:12px;font-weight:750;letter-spacing:.01em;cursor:pointer;transition:background .15s,transform .15s}.primary:hover:not(:disabled){background:#383838;transform:translateY(-1px)}button:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+  .workspace{min-width:0}.preview-panel{padding:22px;min-height:440px;position:relative}.topline{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:17px}.topline h2{font-size:15px;letter-spacing:-.025em;margin:0;font-weight:750}.topline p{font-size:11px;color:var(--muted);margin:5px 0 0}.stats{font-size:10px;font-weight:650;color:#41413e;border:1px solid var(--line);background:#f8f8f7;padding:7px 9px;border-radius:8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .empty{min-height:330px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);border:1px solid var(--line);border-radius:11px;background:repeating-linear-gradient(0deg,#fafaf9,#fafaf9 19px,#f4f4f2 20px),repeating-linear-gradient(90deg,transparent,transparent 19px,#f4f4f2 20px)}.empty .big{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:#9a9a96;margin-bottom:12px}.empty strong{display:block;color:#272725;font-size:13px;font-weight:700}.empty p{font-size:11px;line-height:1.8;margin:7px 0 0}
+  .art-scroll{height:clamp(240px,58vh,620px);min-height:240px;overflow:hidden;position:relative;border:1px solid var(--line);border-radius:11px;background:#f8f8f7;padding:12px;display:flex;align-items:center;justify-content:center;overscroll-behavior:contain;cursor:zoom-in;isolation:isolate}.art-grid{display:grid;position:absolute;left:50%;top:50%;line-height:1;user-select:none;flex:0 0 auto;margin:0;transform:translate(calc(-50% + var(--zoom-shift-x,0px)),calc(-50% + var(--zoom-shift-y,0px))) scale(var(--display-scale,var(--fit-scale,1)));transform-origin:center;pointer-events:none;will-change:transform}.cell{display:flex;align-items:center;justify-content:center;aspect-ratio:1;min-width:0;min-height:0;line-height:1;overflow:hidden}.art-scroll.zoomed{cursor:zoom-out}.loading-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#f4f4f2d9;backdrop-filter:blur(5px)}.loading-card{width:min(240px,calc(100% - 40px));padding:27px 24px 22px;border:1px solid #d7d7d3;border-radius:14px;background:#fff;box-shadow:0 12px 44px #00000012;display:flex;flex-direction:column;align-items:center;gap:17px}.loading-spinner{width:30px;height:30px;border:2px solid #deded9;border-top-color:#161616;border-radius:50%;animation:loading-spin .7s linear infinite}.loading-card strong{font-size:13px;font-weight:700}.loading-track{height:3px;width:100%;background:#e9e9e6;border-radius:99px;overflow:hidden}.loading-track span{display:block;width:0;height:100%;background:#171717;transition:width .12s linear}.loading-percent{font-size:10px;color:#737370;font-variant-numeric:tabular-nums;margin-top:-9px}@keyframes loading-spin{to{transform:rotate(360deg)}}
+  .output{padding:20px 22px;margin-top:18px}.output-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}.output-head h2{font-size:14px;letter-spacing:-.02em;margin:0;font-weight:750}.tiny{color:var(--muted);font-size:10px}.text-output{width:100%;height:110px;resize:vertical;color:#30302e;background:#fafaf9;border:1px solid var(--line);border-radius:9px;padding:12px;font:11px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none;white-space:pre;overflow:auto}.text-output:focus{border-color:#999}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.action{border:1px solid #d2d2ce;background:#fff;color:#242422;border-radius:9px;padding:10px 13px;font-size:11px;font-weight:700;cursor:pointer;transition:all .14s}.action:hover:not(:disabled){background:#f1f1ef;border-color:#8b8b86}.action.accent{background:#171717;border-color:#171717;color:#fff}.action.accent:hover:not(:disabled){background:#383838}.action.success{background:#ededeb;border-color:#ccc;color:#222}
+  .notice{min-height:17px;font-size:11px;color:#4a4a46;margin-top:10px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}.controls{position:static}.preview-panel{min-height:unset}}
+  @media(max-width:520px){.wrap{width:calc(100% - 20px);padding-top:20px}.controls,.preview-panel,.output{padding:15px}.brand{gap:10px}.logo{width:37px;height:37px;padding:7px}h1{font-size:22px}.art-scroll{height:clamp(220px,48vh,460px);min-height:220px;padding:6px}.topline{align-items:flex-start}.stats{font-size:9px;padding:6px 7px}.actions button{flex:1 1 calc(50% - 8px)}.output-head{align-items:flex-start;flex-direction:column;gap:5px}.language{min-width:88px;padding:8px 24px 8px 8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><h1>Emoji Pixel Art</h1></div>
+    <select id="languageSelect" class="language" aria-label="Language"><option value="ja">日本語</option><option value="en">English</option></select>
+  </header>
+  <main class="layout">
+    <aside class="panel controls">
+      <p class="section-title" data-i18n="uploadSection">01 / 画像を読み込む</p>
+      <label class="drop" id="dropZone" for="fileInput" tabindex="0" role="button" aria-label="画像を選択">
+        <span class="upload-icon">＋</span><strong data-i18n="chooseImage">画像を選択</strong><small data-i18n="dragDrop">またはドラッグ＆ドロップ</small><span class="file-name" id="fileName"></span>
+      </label>
+      <input id="fileInput" type="file" accept="image/*">
+      <div class="rule"></div>
+      <p class="section-title" data-i18n="sizeSection">02 / ドットのサイズ</p>
+      <div class="field">
+        <label data-i18n="presets">プリセット</label>
+        <div class="presets">
+          <button class="preset" data-size="8">8 × 8</button><button class="preset" data-size="16">16 × 16</button><button class="preset" data-size="32">32 × 32</button><button class="preset" data-size="64">64 × 64</button><button class="preset" data-size="128">128 × 128</button><button class="preset" data-size="256">256 × 256</button>
+        </div>
+      </div>
+      <div class="field">
+        <label><span class="label-main" data-i18n="outputSize">出力サイズ</span><span data-i18n="colsRows">列 × 行</span></label>
+        <div class="dimension-row">
+          <div class="num-wrap"><input id="cols" type="number" min="4" max="256" value="16" aria-label="横のドット数" data-i18n-aria="colsAria"><span class="unit" data-i18n="colsUnit">列</span></div>
+          <div class="num-wrap"><input id="rows" type="number" min="4" max="256" value="16" aria-label="縦のドット数" data-i18n-aria="rowsAria"><span class="unit" data-i18n="rowsUnit">行</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="fitMode" data-i18n="imageFit">画像の配置</label>
+        <select id="fitMode"><option value="contain" data-i18n="contain">全体を入れる（余白あり）</option><option value="cover" data-i18n="cover">枠いっぱいにする（端をカット）</option><option value="stretch" data-i18n="stretch">枠に合わせて引き伸ばす</option></select>
+      </div>
+      <div class="field">
+        <label for="palette" data-i18n="paletteLabel">絵文字パレット</label>
+        <select id="palette"><option value="blocks" data-i18n="blocks">カラーブロック（色を再現）</option><option value="colorful" data-i18n="colorful">カラフル絵文字</option></select>
+      </div>
+      
+      <button class="primary" id="convertBtn" style="margin-top:15px" disabled data-i18n="convert">絵文字ドット絵に変換</button>
+    </aside>
+    <section class="workspace">
+      <div class="panel preview-panel">
+        <div class="topline"><h2 data-i18n="preview">プレビュー</h2><div class="stats" id="stats"></div></div>
+        <div id="emptyState" class="empty"><strong id="emptyMessage" data-i18n="chooseImage">画像を選択</strong></div>
+        <div id="artScroll" class="art-scroll" hidden><div id="artGrid" class="art-grid" role="img" aria-label="絵文字ドット絵プレビュー"></div></div>
+      </div>
+      <div class="panel output">
+        <div class="output-head"><h2 data-i18n="output">コピー・ダウンロード</h2></div>
+        <textarea id="textOutput" class="text-output" spellcheck="false" readonly placeholder=""></textarea>
+        <div class="actions">
+          <button class="action accent" id="copyBtn" disabled data-i18n="copy">絵文字をコピー</button>
+          <button class="action" id="txtBtn" disabled data-i18n="saveTXT">TXT を保存</button>
+          <button class="action" id="pngBtn" disabled data-i18n="savePNG">PNG 画像を保存</button>
+        </div>
+        <div class="notice" id="notice" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="loadingOverlay" class="loading-overlay" hidden role="status" aria-live="polite">
+  <div class="loading-card">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <strong data-i18n="generating">生成中…</strong>
+    <div class="loading-track" aria-hidden="true"><span id="loadingProgress"></span></div>
+    <div id="loadingPercent" class="loading-percent">0%</div>
+  </div>
+</div>
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const fileInput = $('fileInput'), dropZone = $('dropZone'), colsInput = $('cols'), rowsInput = $('rows');
+  const fitMode = $('fitMode'), paletteSelect = $('palette'), convertBtn = $('convertBtn');
+  const emptyState = $('emptyState'), artScroll = $('artScroll'), artGrid = $('artGrid'), textOutput = $('textOutput');
+  const copyBtn = $('copyBtn'), txtBtn = $('txtBtn'), pngBtn = $('pngBtn'), stats = $('stats'), notice = $('notice');
+  const loadingOverlay = $('loadingOverlay'), loadingProgress = $('loadingProgress'), loadingPercent = $('loadingPercent');
+  let sourceImage = null, sourceUrl = null, outputRows = [], outputGrid = [], currentFileName = 'emoji-pixel-art';
+  let currentLanguage = 'ja', noticeKey = null, noticeError = false, conversionToken = 0;
+  let previewZoomActive = false, pointerFrame = 0, pendingPointerEvent = null;
+  const PREVIEW_ZOOM = 4;
+  const translations = {
+    ja: {
+      uploadSection:'01 / 画像を読み込む', chooseImage:'画像を選択', readyToGenerate:'変換ボタンを押して生成', dragDrop:'またはドラッグ＆ドロップ',
+      sizeSection:'02 / ドットのサイズ', presets:'プリセット', outputSize:'出力サイズ', colsRows:'列 × 行',
+      colsUnit:'列', rowsUnit:'行', colsAria:'横のドット数', rowsAria:'縦のドット数', imageFit:'画像の配置',
+      contain:'全体を入れる（余白あり）', cover:'枠いっぱいにする（端をカット）', stretch:'枠に合わせて引き伸ばす',
+      paletteLabel:'絵文字パレット', blocks:'カラーブロック（色を再現）', colorful:'カラフル絵文字',
+      convert:'絵文字ドット絵に変換', preview:'プレビュー', output:'コピー・ダウンロード', copy:'絵文字をコピー',
+      saveTXT:'TXT を保存', savePNG:'PNG 画像を保存', conversionDone:'変換完了', copyDone:'コピー完了', txtDone:'TXT保存完了',
+      pngDone:'PNG保存完了', generating:'生成中…', conversionError:'変換に失敗しました。サイズを小さくして試してください。', imageOnly:'画像ファイルを選択してください。', loadError:'画像を読み込めませんでした。別の画像を試してください。',
+      copyFallback:'自動コピーできませんでした。選択された文字を Ctrl+C でコピーしてください。', pngError:'PNGを書き出せませんでした。'
+    },
+    en: {
+      uploadSection:'01 / UPLOAD IMAGE', chooseImage:'Choose image', readyToGenerate:'Click Generate to convert', dragDrop:'or drag and drop',
+      sizeSection:'02 / PIXEL SIZE', presets:'Presets', outputSize:'Output size', colsRows:'Columns × Rows',
+      colsUnit:'cols', rowsUnit:'rows', colsAria:'Pixel columns', rowsAria:'Pixel rows', imageFit:'Image fit',
+      contain:'Contain (with margins)', cover:'Cover (crop edges)', stretch:'Stretch to fit',
+      paletteLabel:'Emoji palette', blocks:'Color blocks (match colors)', colorful:'Colorful emoji',
+      convert:'Convert to emoji pixel art', preview:'Preview', output:'Copy & Export', copy:'Copy emoji art',
+      saveTXT:'Save TXT', savePNG:'Save PNG', conversionDone:'Converted', copyDone:'Copied', txtDone:'TXT saved',
+      pngDone:'PNG saved', generating:'Generating…', conversionError:'Conversion failed. Try a smaller size.', imageOnly:'Please choose an image file.', loadError:'Could not load this image. Try another file.',
+      copyFallback:'Auto-copy failed. The text is selected; press Ctrl+C to copy.', pngError:'Could not export PNG.'
+    }
+  };
+  function t(key) { return (translations[currentLanguage] && translations[currentLanguage][key]) || translations.ja[key] || key; }
+  function updateLanguage() {
+    currentLanguage = $('languageSelect').value;
+    document.documentElement.lang = currentLanguage;
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+    dropZone.setAttribute('aria-label', t('chooseImage'));
+    $('emptyMessage').textContent = sourceImage ? t('readyToGenerate') : t('chooseImage');
+    artGrid.setAttribute('aria-label', currentLanguage === 'en' ? 'Emoji pixel art preview' : '絵文字ドット絵プレビュー');
+    if (noticeKey) setNotice(noticeKey, noticeError);
+  }
+
+  const blockPalette = [
+    ['⬛',[28,29,34]],['🩶',[153,160,170]],['⬜',[245,245,240]],['🟫',[133,91,60]],
+    ['🟥',[224,52,55]],['🟧',[245,135,41]],['🟨',[247,215,62]],['🟩',[49,163,81]],
+    ['🟦',[51,123,222]],['🟪',[151,77,194]]
+  ];
+  const colorfulPalette = [
+    ['🖤',[30,31,36]],['🩶',[151,158,168]],['🤍',[245,244,235]],['🤎',[127,83,54]],
+    ['❤️',[222,44,67]],['🧡',[244,126,36]],['💛',[250,211,52]],['💚',[42,171,91]],
+    ['💙',[48,116,218]],['💜',[151,74,190]],['🩷',[245,144,184]],['🩵',[104,205,225]],
+    ['🌹',[184,35,50]],['🍊',[245,138,32]],['🌻',[246,204,43]],['🍀',[40,142,69]],
+    ['🌊',[44,141,206]],['🍇',[112,66,160]],['🍓',[222,49,66]],['🍋',[247,223,61]],
+    ['🥕',[237,111,36]],['🌿',[83,154,75]],['🫐',[65,86,159]],['🌸',[238,158,196]],
+    ['🪵',[146,103,68]],['☁️',[214,222,231]],['🌑',[54,58,73]],['🪨',[119,122,128]],
+    ['🔥',[237,94,40]],['🌱',[113,178,77]],['🐬',[108,194,215]],['🍆',[108,72,138]]
+  ];
+
+  function setNotice(key, isError=false) {
+    noticeKey = key; noticeError = isError;
+    notice.textContent = t(key);
+    notice.style.color = isError ? '#9d2424' : '#4a4a46';
+  }
+  function setActionsEnabled(enabled) {
+    [copyBtn, txtBtn, pngBtn].forEach(b => b.disabled = !enabled);
+  }
+  function clampDimension(input) {
+    let n = Number.parseInt(input.value, 10);
+    if (!Number.isFinite(n)) n = 16;
+    n = Math.max(4, Math.min(256, n));
+    input.value = n;
+    return n;
+  }
+  function getPalette() { return paletteSelect.value === 'colorful' ? colorfulPalette : blockPalette; }
+  function nearestEmoji(rgb, palette) {
+    let best = palette[0], bestDistance = Infinity;
+    for (const entry of palette) {
+      const c = entry[1], dr = rgb[0]-c[0], dg = rgb[1]-c[1], db = rgb[2]-c[2];
+      const distance = 2*dr*dr + 4*dg*dg + 3*db*db;
+      if (distance < bestDistance) { bestDistance = distance; best = entry; }
+    }
+    return best[0];
+  }
+  function drawSourceToGridCanvas(width, height) {
+    const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
+    const ctx = canvas.getContext('2d', {willReadFrequently:true});
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,width,height);
+    const iw = sourceImage.naturalWidth || sourceImage.width, ih = sourceImage.naturalHeight || sourceImage.height;
+    const mode = fitMode.value;
+    if (mode === 'stretch') {
+      ctx.drawImage(sourceImage, 0, 0, width, height);
+    } else {
+      const scale = mode === 'cover' ? Math.max(width/iw, height/ih) : Math.min(width/iw, height/ih);
+      const dw = iw*scale, dh = ih*scale;
+      ctx.drawImage(sourceImage, (width-dw)/2, (height-dh)/2, dw, dh);
+    }
+    return ctx.getImageData(0,0,width,height);
+  }
+  function nextFrame() { return new Promise(resolve => requestAnimationFrame(resolve)); }
+
+  async function renderArt() {
+    if (!sourceImage) return;
+    const token = ++conversionToken;
+    const cols = clampDimension(colsInput), rows = clampDimension(rowsInput);
+    loadingOverlay.hidden = false;
+    loadingProgress.style.width = '0%';
+    loadingPercent.textContent = '0%';
+    convertBtn.disabled = true;
+    setActionsEnabled(false);
+    resetPreviewZoom();
+    outputGrid = []; outputRows = [];
+    artGrid.replaceChildren();
+    stats.textContent = '';
+    await nextFrame();
+    await nextFrame();
+    if (token !== conversionToken) return;
+
+    try {
+      const pixels = drawSourceToGridCanvas(cols, rows).data;
+      const palette = getPalette();
+      const nextGrid = [], nextRows = [];
+      const baseCell = 24;
+      artGrid.style.gridTemplateColumns = `repeat(${cols}, ${baseCell}px)`;
+      artGrid.style.gridTemplateRows = `repeat(${rows}, ${baseCell}px)`;
+      artGrid.style.fontSize = `${baseCell * 0.84}px`;
+      artGrid.style.width = `${cols*baseCell}px`;
+      artGrid.style.height = `${rows*baseCell}px`;
+
+      const rowsPerBatch = 8;
+      for (let y0 = 0; y0 < rows; y0 += rowsPerBatch) {
+        if (token !== conversionToken) return;
+        const fragment = document.createDocumentFragment();
+        const yEnd = Math.min(rows, y0 + rowsPerBatch);
+        for (let y = y0; y < yEnd; y++) {
+          const row = [];
+          for (let x = 0; x < cols; x++) {
+            const idx = (y*cols+x)*4;
+            const alpha = pixels[idx+3]/255;
+            const rgb = [
+              Math.round(pixels[idx]*alpha + 255*(1-alpha)),
+              Math.round(pixels[idx+1]*alpha + 255*(1-alpha)),
+              Math.round(pixels[idx+2]*alpha + 255*(1-alpha))
+            ];
+            const emoji = nearestEmoji(rgb, palette);
+            row.push(emoji);
+            const cell = document.createElement('span');
+            cell.className = 'cell'; cell.textContent = emoji; cell.setAttribute('aria-hidden','true');
+            fragment.appendChild(cell);
+          }
+          nextGrid.push(row); nextRows.push(row.join(''));
+        }
+        artGrid.appendChild(fragment);
+        const progress = Math.round(yEnd / rows * 100);
+        loadingProgress.style.width = `${progress}%`;
+        loadingPercent.textContent = `${progress}%`;
+        await nextFrame();
+      }
+      if (token !== conversionToken) return;
+      outputGrid = nextGrid; outputRows = nextRows;
+      textOutput.value = outputRows.join('\n');
+      emptyState.hidden = true; artScroll.hidden = false;
+      stats.textContent = `${cols} × ${rows}`;
+      fitPreview();
+      setActionsEnabled(true); setNotice('conversionDone');
+    } catch (err) {
+      if (token === conversionToken) {
+        setNotice('conversionError', true);
+        setActionsEnabled(false);
+      }
+    } finally {
+      if (token === conversionToken) {
+        loadingOverlay.hidden = true;
+        convertBtn.disabled = !sourceImage;
+      }
+    }
+  }
+  function fitPreview() {
+    if (artScroll.hidden || !outputGrid.length) return;
+    const cols = outputGrid[0].length, rows = outputGrid.length;
+    const cs = getComputedStyle(artScroll);
+    const availableWidth = Math.max(1, artScroll.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight));
+    const availableHeight = Math.max(1, artScroll.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom));
+    const baseCell = 24;
+    const fitScale = Math.min(availableWidth / (cols * baseCell), availableHeight / (rows * baseCell), 2);
+    artGrid.style.setProperty('--fit-scale', String(fitScale));
+    resetPreviewZoom();
+  }
+  function resetPreviewZoom() {
+    previewZoomActive = false;
+    artScroll.classList.remove('zoomed');
+    artGrid.style.setProperty('--display-scale', artGrid.style.getPropertyValue('--fit-scale') || '1');
+    artGrid.style.setProperty('--zoom-shift-x', '0px');
+    artGrid.style.setProperty('--zoom-shift-y', '0px');
+  }
+  function updatePreviewZoom(event, allowActivate = true) {
+    if (!outputGrid.length || artScroll.hidden || !loadingOverlay.hidden) { resetPreviewZoom(); return; }
+
+    const containerRect = artScroll.getBoundingClientRect();
+    if (event.clientX < containerRect.left || event.clientX > containerRect.right || event.clientY < containerRect.top || event.clientY > containerRect.bottom) {
+      resetPreviewZoom(); return;
+    }
+
+    const imageRect = artGrid.getBoundingClientRect();
+    const isOverImage = event.clientX >= imageRect.left && event.clientX <= imageRect.right && event.clientY >= imageRect.top && event.clientY <= imageRect.bottom;
+    if (!previewZoomActive && (!allowActivate || !isOverImage)) return;
+    if (previewZoomActive && !isOverImage) { resetPreviewZoom(); return; }
+
+    previewZoomActive = true;
+    artScroll.classList.add('zoomed');
+
+    const cols = outputGrid[0].length, rows = outputGrid.length;
+    const baseCell = 24;
+    const fitScale = Number.parseFloat(artGrid.style.getPropertyValue('--fit-scale')) || 1;
+    const displayScale = fitScale * PREVIEW_ZOOM;
+    const centerX = containerRect.left + artScroll.clientLeft + artScroll.clientWidth / 2;
+    const centerY = containerRect.top + artScroll.clientTop + artScroll.clientHeight / 2;
+    const offsetX = event.clientX - centerX;
+    const offsetY = event.clientY - centerY;
+    let shiftX = (1 - PREVIEW_ZOOM) * offsetX;
+    let shiftY = (1 - PREVIEW_ZOOM) * offsetY;
+
+    // Clamp panning only when the enlarged artwork is big enough to cover
+    // the viewport, so no empty edge is exposed while moving around.
+    const viewWidth = Math.max(1, artScroll.clientWidth);
+    const viewHeight = Math.max(1, artScroll.clientHeight);
+    const artWidth = cols * baseCell * displayScale;
+    const artHeight = rows * baseCell * displayScale;
+    if (artWidth >= viewWidth) {
+      const limitX = (artWidth - viewWidth) / 2;
+      shiftX = Math.max(-limitX, Math.min(limitX, shiftX));
+    }
+    if (artHeight >= viewHeight) {
+      const limitY = (artHeight - viewHeight) / 2;
+      shiftY = Math.max(-limitY, Math.min(limitY, shiftY));
+    }
+
+    artGrid.style.setProperty('--display-scale', String(displayScale));
+    artGrid.style.setProperty('--zoom-shift-x', `${shiftX}px`);
+    artGrid.style.setProperty('--zoom-shift-y', `${shiftY}px`);
+  }
+  function clearGeneratedArt() {
+    conversionToken++;
+    loadingOverlay.hidden = true;
+    resetPreviewZoom();
+    outputGrid = []; outputRows = [];
+    artGrid.replaceChildren();
+    artScroll.hidden = true;
+    emptyState.hidden = false;
+    $('emptyMessage').textContent = sourceImage ? t('readyToGenerate') : t('chooseImage');
+    stats.textContent = '';
+    textOutput.value = '';
+    setActionsEnabled(false);
+    notice.textContent = '';
+    noticeKey = null; noticeError = false;
+    loadingProgress.style.width = '0%';
+    loadingPercent.textContent = '0%';
+  }
+
+  function loadFile(file) {
+    if (!file) return;
+    resetPreviewZoom();
+    if (!file.type.startsWith('image/')) { setNotice('imageOnly', true); return; }
+    if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+    sourceUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      sourceImage = img;
+      currentFileName = (file.name || 'emoji-pixel-art').replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]+/g,'_') || 'emoji-pixel-art';
+      $('fileName').textContent = `✓ ${file.name}  ·  ${img.naturalWidth} × ${img.naturalHeight}`;
+      clearGeneratedArt();
+      convertBtn.disabled = false;
+    };
+    img.onerror = () => setNotice('loadError', true);
+    img.src = sourceUrl;
+  }
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  async function copyText() {
+    const text = textOutput.value;
+    try {
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+      else {
+        textOutput.focus(); textOutput.select();
+        if (!document.execCommand('copy')) throw new Error('copy failed');
+        textOutput.setSelectionRange(0,0);
+      }
+      setNotice('copyDone');
+    } catch (err) {
+      textOutput.focus(); textOutput.select();
+      setNotice('copyFallback', true);
+    }
+  }
+  function downloadPng() {
+    if (!outputGrid.length) return;
+    const cols = outputGrid[0].length, rows = outputGrid.length;
+    // Keep the PNG canvas within a practical size even at 256 × 256.
+    const cellSize = Math.max(8, Math.min(48, Math.floor(4096 / Math.max(cols, rows))));
+    const canvas = document.createElement('canvas'); canvas.width = cols*cellSize; canvas.height = rows*cellSize;
+    const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `${Math.floor(cellSize*0.8)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+    outputGrid.forEach((row,y) => row.forEach((emoji,x) => ctx.fillText(emoji, x*cellSize+cellSize/2, y*cellSize+cellSize/2+1)));
+    canvas.toBlob(blob => { if (blob) { downloadBlob(blob, `${currentFileName}-emoji-pixel-art.png`); setNotice('pngDone'); } else setNotice('pngError', true); }, 'image/png');
+  }
+
+  $('languageSelect').addEventListener('change', updateLanguage);
+  const previewResizeObserver = new ResizeObserver(() => fitPreview());
+  previewResizeObserver.observe(artScroll);
+  artScroll.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    // RAF keeps zoom transforms smooth while the entire preview viewport magnifies.
+    pendingPointerEvent = { clientX: e.clientX, clientY: e.clientY };
+    if (!pointerFrame) pointerFrame = requestAnimationFrame(() => {
+      pointerFrame = 0;
+      if (pendingPointerEvent) updatePreviewZoom(pendingPointerEvent);
+    });
+  });
+  artScroll.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') resetPreviewZoom(); });
+  artScroll.addEventListener('click', e => {
+    if (!window.matchMedia('(hover: none)').matches || !outputGrid.length) return;
+    if (previewZoomActive) { resetPreviewZoom(); return; }
+    updatePreviewZoom(e, true);
+  });
+  fileInput.addEventListener('change', e => loadFile(e.target.files && e.target.files[0]));
+  dropZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+  ['dragenter','dragover'].forEach(type => dropZone.addEventListener(type, e => { e.preventDefault(); dropZone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(type => dropZone.addEventListener(type, e => { e.preventDefault(); dropZone.classList.remove('drag'); }));
+  dropZone.addEventListener('drop', e => loadFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]));
+  convertBtn.addEventListener('click', renderArt);
+  [colsInput, rowsInput].forEach(input => input.addEventListener('change', () => { clampDimension(input); }));
+  document.querySelectorAll('[data-size]').forEach(button => button.addEventListener('click', () => {
+    const n = Number(button.dataset.size); colsInput.value = n; rowsInput.value = n;
+  }));
+  copyBtn.addEventListener('click', copyText);
+  txtBtn.addEventListener('click', () => { downloadBlob(new Blob([textOutput.value], {type:'text/plain;charset=utf-8'}), `${currentFileName}-emoji-pixel-art.txt`); setNotice('txtDone'); });
+  pngBtn.addEventListener('click', downloadPng);
+  updateLanguage();
+})();
+</script>
+</body>
+</html>
